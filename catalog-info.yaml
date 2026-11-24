@@ -1,86 +1,13 @@
-# Backstage Software Catalog descriptor — demo-product-api.
-#
-# This repository anchors the shared platform entities for the whole
-# Demo Commerce Platform (domain, system, owning group) plus its own
-# component and API entities.
-
-apiVersion: backstage.io/v1alpha1
-kind: Domain
-metadata:
-  name: commerce
-  description: Commerce domain of the organization.
-spec:
-  owner: group:default/platform-team
----
-apiVersion: backstage.io/v1alpha1
-kind: System
-metadata:
-  name: demo-commerce
-  description: >
-    Demo Commerce Platform — polyglot reference workload used to exercise
-    CI/CD, catalog, governance and observability tooling on devex.io.
-  tags:
-    - demo-commerce
-    - reference-workload
-spec:
-  owner: group:default/platform-team
-  domain: commerce
----
-apiVersion: backstage.io/v1alpha1
-kind: Group
-metadata:
-  name: platform-team
-  description: Platform engineering team owning the Demo Commerce Platform.
-spec:
-  type: team
-  children: []
----
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: demo-product-api
-  description: >
-    Product aggregation API (NestJS). Orchestration layer consumed by the
-    storefront; fans out to details, reviews and ratings services with
-    graceful degradation.
-  tags:
-    - demo-commerce
-    - lang-typescript
-    - framework-nestjs
-    - app-backend-api
-    - app-orchestrator
-    - criticality-high
-    - runtime-nodejs
+  name: "demo-product-api"
+  description: ""
   annotations:
-    backstage.io/techdocs-ref: dir:.
-spec:
-  type: service
-  lifecycle: production
-  owner: group:default/platform-team
-  system: demo-commerce
-  providesApis:
-    - product-api
-  consumesApis:
-    - details-api
-    - reviews-api
-    - ratings-api
-  dependsOn:
-    - component:demo-details-api
-    - component:demo-reviews-api
-    - component:demo-ratings-api
----
-apiVersion: backstage.io/v1alpha1
-kind: API
-metadata:
-  name: product-api
-  description: Aggregated product API exposed to demo-commerce-web.
+    github.com/project-slug: "renanlJ/demo-product-api"
   tags:
-    - api-rest
-    - demo-commerce
+    - "typescript"
 spec:
-  type: openapi
-  lifecycle: production
-  owner: group:default/platform-team
-  system: demo-commerce
-  definition:
-    $text: ./docs/api/openapi.yaml
+  type: "service"
+  lifecycle: "experimental"
+  owner: "user:development/guest"
