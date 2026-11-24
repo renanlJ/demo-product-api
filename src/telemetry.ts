@@ -7,9 +7,13 @@
 const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
 if (endpoint) {
-  const { NodeSDK } = require('@opentelemetry/sdk-node');
-  const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-  const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+  const { NodeSDK } = require("@opentelemetry/sdk-node");
+  const {
+    getNodeAutoInstrumentations,
+  } = require("@opentelemetry/auto-instrumentations-node");
+  const {
+    OTLPTraceExporter,
+  } = require("@opentelemetry/exporter-trace-otlp-http");
 
   // service.name is picked up from OTEL_SERVICE_NAME / OTEL_RESOURCE_ATTRIBUTES.
   const sdk = new NodeSDK({
@@ -17,7 +21,7 @@ if (endpoint) {
     instrumentations: [getNodeAutoInstrumentations()],
   });
   sdk.start();
-  process.on('SIGTERM', () => {
+  process.on("SIGTERM", () => {
     sdk.shutdown().finally(() => process.exit(0));
   });
 }
