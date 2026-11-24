@@ -1,0 +1,20 @@
+# GOVERNANCE TEST FIXTURE — kustomize patch that forces a deployment
+# failure (ImagePullBackOff) by pointing at a tag that does not exist.
+#
+# Activate:
+#   kubectl apply -k deploy/platform                    # baseline
+#   kubectl -n demo-commerce patch deployment demo-ratings-api \
+#     --type=json -p '[{"op":"replace","path":"/spec/template/spec/containers/0/image","value":"ghcr.io/renanlj/demo-ratings-api:does-not-exist"}]'
+#
+# Reset:
+#   kubectl -n demo-commerce rollout undo deployment/demo-ratings-api
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-ratings-api
+spec:
+  template:
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/renanlj/demo-ratings-api:does-not-exist

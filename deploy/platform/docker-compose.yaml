@@ -1,0 +1,84 @@
+# Full-stack local deployment of the Demo Commerce Platform.
+# Expects the five repositories checked out as sibling directories:
+#   ~/repos/{demo-commerce-web,demo-product-api,demo-details-api,
+#            demo-reviews-api,demo-ratings-api}
+#
+# Usage:
+#   docker compose -f deploy/platform/docker-compose.yaml up --build
+#   open http://localhost:8080
+
+name: demo-commerce
+
+services:
+  web:
+    build:
+      context: ../../../demo-commerce-web
+    image: demo-commerce-web:0.1.0
+    ports:
+      - "8080:8080"
+    environment:
+      PRODUCT_API_URL: http://product-api:3000
+    depends_on:
+      - product-api
+    networks:
+      - commerce
+
+  product-api:
+    build:
+      context: ../../../demo-product-api
+    image: demo-product-api:0.1.0
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      LOG_LEVEL: info
+      DETAILS_API_URL: http://details-api:8081
+      REVIEWS_API_URL: http://reviews-api:8000
+      RATINGS_API_URL: http://ratings-api:8083
+      DOWNSTREAM_TIMEOUT_MS: "2000"
+      # OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    depends_on:
+      - details-api
+      - reviews-api
+      - ratings-api
+    networks:
+      - commerce
+
+  details-api:
+    build:
+      context: ../../../demo-details-api
+    image: demo-details-api:0.1.0
+    ports:
+      - "8081:8081"
+    environment:
+      PORT: "8081"
+      LOG_LEVEL: INFO
+    networks:
+      - commerce
+
+  reviews-api:
+    build:
+      context: ../../../demo-reviews-api
+    image: demo-reviews-api:0.1.0
+    ports:
+      - "8000:8000"
+    environment:
+      LOG_LEVEL: info
+    networks:
+      - commerce
+
+  ratings-api:
+    build:
+      context: ../../../demo-ratings-api
+    image: demo-ratings-api:0.1.0
+    ports:
+      - "8083:8083"
+    environment:
+      PORT: "8083"
+      LOG_LEVEL: info
+    networks:
+      - commerce
+
+networks:
+  commerce:
+    driver: bridge

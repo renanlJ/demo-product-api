@@ -1,0 +1,7 @@
+# GOVERNANCE TEST FIXTURE — DO NOT INSTALL, DO NOT SHIP.
+#
+# Deliberately pinned outdated packages so SCA tooling (pip-audit,
+# trivy fs) produces deterministic findings for pipeline demos.
+# Only ever fed to scanners with `-r`; nothing installs it.
+urllib3==1.24.1
+requests==2.19.0

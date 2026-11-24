@@ -1,0 +1,11 @@
+# GOVERNANCE TEST FIXTURE — deployment-failure scenario overlay.
+# Replaces the ratings image tag with one that does not exist, so a live
+# `kubectl apply -k` produces ImagePullBackOff. Renders fine statically.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: demo-commerce
+resources:
+  - ../../platform
+images:
+  - name: ghcr.io/renanlj/demo-ratings-api
+    newTag: does-not-exist

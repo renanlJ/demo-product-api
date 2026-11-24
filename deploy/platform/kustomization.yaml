@@ -1,0 +1,17 @@
+# Umbrella kustomization for the whole Demo Commerce Platform.
+#
+# Deploys every service into the demo-commerce namespace. Paths are
+# relative to the sibling repository checkouts, so clone all five repos
+# next to each other (the docker-compose layout).
+#
+#   kubectl apply -k deploy/platform
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: demo-commerce
+resources:
+  - namespace.yaml
+  - ../../../demo-commerce-web/deploy/kubernetes
+  - ../../../demo-details-api/deploy/kubernetes
+  - ../../../demo-reviews-api/deploy/kubernetes
+  - ../../../demo-ratings-api/deploy/kubernetes
+  - ../kubernetes

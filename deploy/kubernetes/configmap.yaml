@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-product-api
+  labels:
+    app: demo-product-api
+    system: demo-commerce
+data:
+  PORT: "3000"
+  LOG_LEVEL: info
+  FAIL_READINESS: "false"
+  DOWNSTREAM_TIMEOUT_MS: "2000"
+  # Kubernetes DNS — services live in the same namespace.
+  DETAILS_API_URL: http://demo-details-api:8081
+  REVIEWS_API_URL: http://demo-reviews-api:8000
+  RATINGS_API_URL: http://demo-ratings-api:8083
+  OTEL_EXPORTER_OTLP_ENDPOINT: ""

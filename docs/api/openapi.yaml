@@ -1,0 +1,154 @@
+openapi: 3.1.0
+info:
+  title: demo-product-api
+  version: 0.1.0
+  description: >
+    Product aggregation API for the Demo Commerce Platform. Orchestration
+    layer consumed by demo-commerce-web; fans out to demo-details-api,
+    demo-reviews-api and demo-ratings-api with graceful degradation.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: products
+    description: Aggregated product views.
+  - name: platform
+    description: Health, readiness and metrics.
+paths:
+  /api/v1/products:
+    get:
+      operationId: listProducts
+      summary: List catalog products with aggregated ratings.
+      tags: [products]
+      responses:
+        "200":
+          description: Catalog list. `averageRating` is null when the ratings service is unavailable.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductSummary"
+        "502":
+          description: The required details service failed.
+  /api/v1/products/{productId}:
+    get:
+      operationId: getProduct
+      summary: Full aggregated product view (details + reviews + rating).
+      tags: [products]
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: "^SKU-[0-9]+$"
+      responses:
+        "200":
+          description: Aggregated product. `degraded` is true when optional downstreams failed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductAggregate"
+        "404":
+          description: Unknown product (propagated from details service).
+        "502":
+          description: The required details service failed.
+  /healthz:
+    get:
+      operationId: healthz
+      summary: Liveness probe.
+      tags: [platform]
+      responses:
+        "200":
+          description: Process is alive.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /readyz:
+    get:
+      operationId: readyz
+      summary: Readiness probe.
+      tags: [platform]
+      responses:
+        "200":
+          description: Service is ready.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+components:
+  schemas:
+    ProductSummary:
+      type: object
+      required: [productId, name, category, price, currency, averageRating]
+      properties:
+        productId: {type: string, example: SKU-1001}
+        name: {type: string, example: Aurora Coffee Maker}
+        category: {type: string, example: Appliances}
+        price: {type: number, format: double, example: 129.99}
+        currency: {type: string, example: USD}
+        averageRating:
+          type: number
+          format: double
+          nullable: true
+          example: 4.43
+    ProductDetails:
+      type: object
+      required: [productId, name, description, category, price, currency, specifications]
+      properties:
+        productId: {type: string}
+        name: {type: string}
+        description: {type: string}
+        category: {type: string}
+        price: {type: number, format: double}
+        currency: {type: string}
+        specifications:
+          type: object
+          additionalProperties: {type: string}
+    Review:
+      type: object
+      required: [id, productId, reviewer, text, rating, createdAt]
+      properties:
+        id: {type: string}
+        productId: {type: string}
+        reviewer: {type: string}
+        text: {type: string}
+        rating: {type: integer, minimum: 1, maximum: 5}
+        createdAt: {type: string, format: date-time}
+    RatingSummary:
+      type: object
+      required: [productId, average, count, distribution]
+      properties:
+        productId: {type: string}
+        average: {type: number, format: double}
+        count: {type: integer}
+        distribution:
+          type: object
+          additionalProperties: {type: integer}
+          description: Count of ratings per star value ("1".."5").
+    ProductAggregate:
+      type: object
+      required: [productId, details, reviews, rating, degraded]
+      properties:
+        productId: {type: string}
+        details:
+          $ref: "#/components/schemas/ProductDetails"
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        rating:
+          allOf:
+            - $ref: "#/components/schemas/RatingSummary"
+          nullable: true
+        degraded:
+          type: boolean
+          description: True when reviews or ratings downstreams failed; partial payload returned.
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]

@@ -1,0 +1,11 @@
+# GOVERNANCE TEST FIXTURE — intentionally invalid Backstage descriptor.
+# Missing spec.owner and spec.system; metadata.description is absent.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo-broken-service
+  tags:
+    - demo-commerce
+spec:
+  type: service
+  lifecycle: production

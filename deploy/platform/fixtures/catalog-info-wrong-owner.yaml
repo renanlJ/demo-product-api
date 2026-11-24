@@ -1,0 +1,14 @@
+# GOVERNANCE TEST FIXTURE — valid syntax, wrong ownership metadata.
+# spec.owner references a group that does not exist in the catalog.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo-orphaned-service
+  description: Fixture with an owner that cannot be resolved.
+  tags:
+    - demo-commerce
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/nonexistent-team
+  system: demo-commerce
