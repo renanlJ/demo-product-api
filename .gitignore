@@ -5,3 +5,8 @@ test-results/
 *.tsbuildinfo
 *.log
 .DS_Store
+
+# functional test venv
+.venv*/
+__pycache__/
+.pytest_cache/

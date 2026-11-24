@@ -1,0 +1,3 @@
+# Functional test toolchain — black-box tests against the running platform.
+pytest==9.2.0
+httpx==0.28.1

@@ -40,6 +40,22 @@ All 5 containers `Up`; verified with curl:
 | `GET /metrics` on all 4 backends | Prometheus text with request counters/histograms |
 | `GET /healthz`, `GET /readyz` on all 4 backends | 200 JSON |
 
+## Functional test suite (`tests/functional/`)
+
+38 black-box pytest tests executed against the live compose stack —
+**38 passed in ~21s**:
+
+| Suite | Tests | Covers |
+| ----- | ----- | ------ |
+| `test_health.py` | 11 | healthz/readyz/metrics on all 4 backends, duration histograms |
+| `test_catalog.py` | 7 | catalog list, aggregate merge, 404s, nginx `/api/` proxy, SPA assets, full chain via :8080 |
+| `test_contract.py` | 6 | strict field/type conformance vs each service's OpenAPI schemas |
+| `test_headers.py` | 5 | `X-Request-ID` echo+generation, `traceparent` acceptance, content types |
+| `test_resilience.py` | 5 | reviews down → `degraded:true`; ratings down → `rating:null`; details down → 502; full recovery; `FAIL_READINESS` env → 503 |
+
+All URLs are env-overridable so the same suite targets port-forwards or
+clusters; `resilience` tests need local compose.
+
 ## Kubernetes manifests (static — per approved scope)
 
 | Check | Result |
